@@ -1,0 +1,50 @@
+[package]
+name = "daylight"
+version = "0.1.0"
+description = "A minimal, private diary"
+edition = "2021"
+
+[lib]
+name = "daylight_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+uuid = { version = "1", features = ["v4"] }
+
+# encryption
+argon2 = "0.5"
+chacha20poly1305 = "0.10"
+rand = "0.8"
+base64 = "0.22"
+sha2 = "0.10"
+zeroize = "1"
+
+# Google Drive backup
+tokio = { version = "1", features = ["net", "io-util", "time", "sync"] }
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json"] }
+webbrowser = "1"
+
+# key storage for biometric unlock (Android uses a private file instead)
+[target.'cfg(not(target_os = "android"))'.dependencies]
+keyring = { version = "3", features = ["apple-native", "windows-native", "sync-secret-service"] }
+
+# Windows Hello
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.61", features = [
+  "Foundation",
+  "Security_Credentials_UI",
+  "Win32_Foundation",
+  "Win32_System_WinRT",
+] }
+windows-future = "0.2"
+raw-window-handle = "0.6"
+
+# Face ID / Touch ID / Android biometrics
+[target.'cfg(any(target_os = "android", target_os = "ios"))'.dependencies]
+tauri-plugin-biometric = "2"
